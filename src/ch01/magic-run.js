@@ -6,7 +6,7 @@ const run2 = function(f, g) {
 }
 
 // -run- with three functions
-const run3 = function(f, g, h) {
+export const run = function(f, g, h) {
   return function(x) {
     return f(g(h(x)));
   }
@@ -23,7 +23,7 @@ const double = run2(add1, add1);
 
 console.log(double(2)); // -> 4
 
-const testRun = run3(negate, square, mult2);
+const testRun = run(negate, square, mult2);
 
 console.log(testRun(2)); // -> -16
 
@@ -32,7 +32,7 @@ const h1 = message => `<h1>${message}</h1>`;
 const addToDom = selector => message => document.querySelector(selector).innerHTML = message;
 const addToConsole = message => console.log(message);
 
-const printMessage = run3(addToConsole, h1, echo);
+const printMessage = run(addToConsole, h1, echo);
 printMessage('Hello World'); // -> <h1>Hello wordl</h1>
 
 // imperative

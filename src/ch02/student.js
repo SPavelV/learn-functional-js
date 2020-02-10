@@ -78,12 +78,53 @@ class Student extends Person {
 }
 
 class Address {
-  constructor(country) {
+  constructor(country, state, city, zip, street) {
     this._country = country;
+    this._state = state;
+    this._city = city;
+    this._zip = zip;
+    this._street = street;
+  }
+
+  get street() {
+    return this._street;
+  }
+
+  get city() {
+    return this._city;
+  }
+
+  get state() {
+    return this._street;
+  }
+
+  get zip() {
+    return this._zip;
   }
 
   get country() {
     return this._country;
+  }
+}
+
+function zipCode(code, location) {
+  let _code = code;
+  let _location = location;
+
+  return {
+    code: function() {
+      return _code;
+    },
+    location: function() {
+      return _location;
+    },
+    fromString: function(str) {
+      let parts = str.split('-');
+      return zipCode(parts[0], parts[1]);
+    },
+    toString: function() {
+      return _code + '-' + _location;
+    }
   }
 }
 
@@ -100,7 +141,7 @@ const kleene = new Student('Stephen', 'Kleene', '444-44-4444', 'Princeton');
 kleene.address = new Address('US');
 
 church.studentsInSameCountryAndSchool([curry, turing, kleene]);
-console.log('church.studentsInSameCountryAndSchool([curry, turing, kleene])', church.studentsInSameCountryAndSchool([curry, turing, kleene]));
+// console.log('church.studentsInSameCountryAndSchool([curry, turing, kleene])', church.studentsInSameCountryAndSchool([curry, turing, kleene]));
 
 function selector(country, school) {
   return function(student) {
@@ -111,4 +152,28 @@ function selector(country, school) {
 const findStudentBy = function(friends, selector) {
   return friends.filter(selector);
 }
-console.log(" findStudentBy([curry, turing, kleene], selector('US', 'Princeton')):", findStudentBy([curry, turing, kleene], selector('US', 'Princeton')));
+// console.log(" findStudentBy([curry, turing, kleene], selector('US', 'Princeton')):", findStudentBy([curry, turing, kleene], selector('US', 'Princeton')));
+
+
+// if use meta property writabel = fales
+const person = Object.freeze(new Person('Haskell', 'Curry', '444-44-4444'));
+person.firsname = 'Bob'; // error: Cannot assign to read only property '_firstname'
+
+const personSecond = new Person('Haskell', 'Curry', '444-44-4444');
+personSecond.address = new Address('US', 'NJ', 'Princeton', zipCode('08544', '1234'), 'Alexander St.');
+
+personSecond = Object.freeze(person);
+
+person.address._country = 'France'; // -> allowed!
+person.address.country; // -> 'France's
+
+const isObject = val => val && typeof val === 'object';
+
+function deepFreeze(obj) {
+  if(isObject(obj) && !Object.isFrozen(obj)) {
+    Object.keys(obj).forEach(name => deepFreeze(obj[name]));
+    Object.freeze(obj);
+  }
+
+  return obj;
+}
